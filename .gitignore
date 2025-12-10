@@ -1,0 +1,68 @@
+# =========================
+# CLion / JetBrains
+# =========================
+.idea/
+cmake-build-*/
+
+# =========================
+# CMake
+# =========================
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+
+# =========================
+# Compiled Object Files
+# =========================
+*.o
+*.obj
+*.lo
+*.slo
+
+# =========================
+# Compiled Dynamic Libraries
+# =========================
+*.so
+*.dylib
+*.dll
+
+# =========================
+# Compiled Static Libraries
+# =========================
+*.a
+*.lib
+
+# =========================
+# Executables
+# =========================
+*.exe
+*.out
+*.app
+
+# =========================
+# Windows-specific
+# =========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================
+# Logs / Temporary Files
+# =========================
+*.log
+*.tmp
+*.temp
+
+# =========================
+# Editor Backups
+# =========================
+*~
+*.swp
+*.swo
