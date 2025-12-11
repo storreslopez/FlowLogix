@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -41,8 +42,14 @@ int main() {
     long codigos[numeroEmpleados];
     string nombres[numeroEmpleados];
     char oficina[numeroEmpleados];
+    vector<short> empleadosConTardanza;
+    vector<short> empleadosPuntuales;
 
-    float datosNum[numeroEmpleados][NUMERO_DATOS];
+    // Declaramos para evitar nullptr
+    double sumaHorasPorOficina[3] = {0.0, 0.0, 0.0};
+    int puntualesPorOficina[3] = {0, 0, 0};
+
+    float datosEmpleados[numeroEmpleados][NUMERO_DATOS];
     // datosNum[i][0] → horas trabajadas
     // datosNum[i][1] → minutos tardanza
     // datosNum[i][2] → valor hora
@@ -171,7 +178,8 @@ int main() {
                             cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
                         }
                     }
-                    datosNum[i][0] = horasSemanales;
+                    datosEmpleados[i][0] = horasSemanales;
+
 
                     float minutosTardanza;
                     bool minutosValidos = false;
@@ -189,7 +197,30 @@ int main() {
                             cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
                         }
                     }
-                    datosNum[i][1] = minutosTardanza;
+                    datosEmpleados[i][1] = minutosTardanza;
+
+                    if (minutosTardanza == 0) empleadosPuntuales.push_back(i);
+                    if (minutosTardanza > 0) empleadosConTardanza.push_back(i);
+
+                    const float horasNetasTrabajadas = horasSemanales - (minutosTardanza / 60.0f);
+
+                    if (minutosTardanza == 0) {
+                        int oficinaIndex;
+                        switch (oficinaEmpleado) {
+                            case 'C':
+                                oficinaIndex = 0;
+                                break;
+                            case 'S':
+                                oficinaIndex = 1;
+                                break;
+                            case 'L':
+                                oficinaIndex = 2;
+                                break;
+                        }
+
+                        sumaHorasPorOficina[oficinaIndex] += horasNetasTrabajadas;
+                        puntualesPorOficina[oficinaIndex]++;
+                    }
 
                     float valorHora;
                     bool valorHoraValido = false;
@@ -207,11 +238,11 @@ int main() {
                             cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
                         }
                     }
-                    datosNum[i][2] = valorHora;
+                    datosEmpleados[i][2] = valorHora;
 
-                    datosNum[i][3] = horasSemanales - (minutosTardanza / 60.0f);
-                    datosNum[i][4] = (minutosTardanza / 60.0f) * valorHora;
-                    datosNum[i][5] = datosNum[i][3] * valorHora;
+                    datosEmpleados[i][3] = horasNetasTrabajadas;
+                    datosEmpleados[i][4] = (minutosTardanza / 60.0f) * valorHora;
+                    datosEmpleados[i][5] = datosEmpleados[i][3] * valorHora;
                 }
                 break;
             }
@@ -247,6 +278,20 @@ int main() {
                 }
 
                 if (empleadoIndex >= 0) {
+                    string oficinaEmpleado;
+
+                    switch (oficina[empleadoIndex]) {
+                        case 'C':
+                            oficinaEmpleado = "Contabilidad";
+                            break;
+                        case 'S':
+                            oficinaEmpleado = "Sistemas";
+                            break;
+                        case 'L':
+                            oficinaEmpleado = "Logistica";
+                            break;
+                    }
+
                     cout << fixed << setprecision(2);
 
                     cout << "\n╔════════════════════════════════════════════════════════════════╗\n";
@@ -255,26 +300,35 @@ int main() {
 
                     cout << left << setw(30) << "  Código del empleado:" << codigoEmpleado << "\n";
                     cout << left << setw(30) << "  Nombre completo:" << nombres[empleadoIndex] << "\n";
-                    cout << left << setw(30) << "  Oficina:" << oficina[empleadoIndex] << "\n";
+                    cout << left << setw(30) << "  Oficina:" << oficinaEmpleado << "\n";
 
                     cout << "\n" << string(64, '-') << "\n";
                     cout << "  INFORMACIÓN LABORAL\n";
                     cout << string(64, '-') << "\n\n";
 
-                    cout << left << setw(30) << "  Valor por hora:" << right << setw(10) << "$" << datosNum[empleadoIndex][2] << "\n";
-                    cout << left << setw(30) << "  Horas semanales trabajadas:" << right << setw(10) << datosNum[empleadoIndex][0] << " hrs\n";
-                    cout << left << setw(30) << "  Minutos de tardanza semanal:" << right << setw(10) << datosNum[empleadoIndex][1] << " min\n";
+                    cout << left << setw(30) << "  Valor por hora:" << right << setw(10) << "$" << datosEmpleados[
+                        empleadoIndex][2] << "\n";
+                    cout << left << setw(30) << "  Horas semanales trabajadas:" << right << setw(10) << datosEmpleados[
+                        empleadoIndex][0] << " hrs\n";
+                    cout << left << setw(30) << "  Minutos de tardanza semanal:" << right << setw(10) << datosEmpleados[
+                        empleadoIndex][1] << " min\n";
 
                     cout << "\n" << string(64, '-') << "\n";
                     cout << "  CÁLCULOS SALARIALES\n";
                     cout << string(64, '-') << "\n\n";
 
-                    cout << left << setw(30) << "  Horas descontadas:" << right << setw(10) << (datosNum[empleadoIndex][1] / 60.0) << " hrs\n";
-                    cout << left << setw(30) << "  Horas netas de trabajo:" << right << setw(10) << datosNum[empleadoIndex][3] << " hrs\n";
-                    cout << left << setw(30) << "  Valor descuento efectuado:" << right << setw(10) << "$" << datosNum[empleadoIndex][4] << "\n";
+                    cout << left << setw(30) << "  Horas descontadas:" << right << setw(10) << (
+                        datosEmpleados[empleadoIndex][1] / 60.0) << " hrs\n";
+                    cout << left << setw(30) << "  Horas netas de trabajo:" << right << setw(10) << datosEmpleados[
+                        empleadoIndex][3] << " hrs\n";
+                    cout << left << setw(30) << "  Valor descuento efectuado:" << right << setw(10) << "$" <<
+                            datosEmpleados[
+                                empleadoIndex][4] << "\n";
 
                     cout << "\n" << string(64, '-') << "\n";
-                    cout << left << setw(30) << "  SALARIO NETO A CANCELAR:" << right << setw(10) << "$" << datosNum[empleadoIndex][5] << "\n";
+                    cout << left << setw(30) << "  SALARIO NETO A CANCELAR:" << right << setw(10) << "$" <<
+                            datosEmpleados[
+                                empleadoIndex][5] << "\n";
                     cout << string(64, '-') << "\n\n";
                 } else {
                     cout << "❌ Error: No hay ningun empleado con ese ID!\n" << endl;
@@ -286,6 +340,162 @@ int main() {
                 break;
             }
             case 3: {
+                cout << "1 Reporte de empleados con registro de tardanza" << endl;
+                cout << "2 Reporte de empleados puntuales" << endl;
+                cout << "3 Reporte descuento tiempo tardanza" << endl;
+
+                short opcionSubMenu;
+                bool opcionSubMenuValida = false;
+                while (!opcionSubMenuValida) {
+                    cout << "\n► Seleccione una opcion [1-3]: ";
+                    cin >> opcionSubMenu;
+
+                    if (cin.fail()) {
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "❌ Error: Ingrese un entero valido.\n" << endl;
+                    } else if (opcionSubMenu >= 1 && opcionSubMenu <= 3) {
+                        opcionSubMenuValida = true;
+                    } else {
+                        cout << "❌ Error: Opcion fuera del rango (1-3).\n" << endl;
+                    }
+                }
+
+                system("clear || cls");
+                switch (opcionSubMenu) {
+                    case 1: {
+                        if (empleadosConTardanza.empty()) {
+                            cout << "\n⚠️ No hay empleados con tardanzas." << endl;
+                            break;
+                        }
+
+                        short indiceConMayorTardanza = empleadosConTardanza[0];
+                        short indiceConMenorTardanza = empleadosConTardanza[0];
+                        double sumaTardanzas = 0.0;
+
+                        cout << "\n=== EMPLEADOS CON TARDANZA ===\n";
+                        cout << fixed << setprecision(2);
+
+                        for (const short indiceEmpleado: empleadosConTardanza) {
+                            const float tardanza = datosEmpleados[indiceEmpleado][1];
+                            sumaTardanzas += tardanza;
+
+                            if (tardanza > datosEmpleados[indiceConMayorTardanza][1]) {
+                                indiceConMayorTardanza = indiceEmpleado;
+                            }
+
+                            if (tardanza < datosEmpleados[indiceConMenorTardanza][1]) {
+                                indiceConMenorTardanza = indiceEmpleado;
+                            }
+
+                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
+                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
+                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
+                            cout << "Minutos de Tardanza: " << tardanza << " mins" << endl;
+                            cout << "Horas de Tardanza: " << (tardanza / 60.0f) << " hrs" << endl;
+                        }
+
+                        if (!empleadosPuntuales.empty()) {
+                            indiceConMenorTardanza = empleadosPuntuales[0];
+                        }
+
+                        const double promedioTardanza =
+                                sumaTardanzas / static_cast<double>(empleadosConTardanza.size());
+
+                        cout << "\n=== RESUMEN ===\n";
+                        cout << "Empleado con MAYOR tardanza: " << nombres[indiceConMayorTardanza]
+                                << " (" << datosEmpleados[indiceConMayorTardanza][1] << " mins)\n";
+                        cout << "Empleado con MENOR tardanza: " << nombres[indiceConMenorTardanza]
+                                << " (" << datosEmpleados[indiceConMenorTardanza][1] << " mins)\n";
+                        cout << "Promedio de tardanzas: " << promedioTardanza << " mins\n";
+
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "\nPresione ENTER para continuar...";
+                        cin.get();
+                        break;
+                    }
+                    case 2: {
+                        if (empleadosPuntuales.empty()) {
+                            cout << "\n⚠️ No hay empleados puntuales!\n" << endl;
+                            break;
+                        }
+
+                        cout << "\n=== EMPLEADOS PUNTUALES ===\n";
+                        cout << fixed << setprecision(2);
+
+                        for (const short indiceEmpleado: empleadosPuntuales) {
+                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
+                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
+                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
+                            cout << "Horas Trabajadas: " << datosEmpleados[indiceEmpleado][2] << " hrs" << endl;
+                        }
+
+                        if (puntualesPorOficina[0] > 0) {
+                            const double promedio = sumaHorasPorOficina[0] / puntualesPorOficina[0];
+                            cout << "Promedio de Contabilidad: " << promedio << " hrs ("
+                                    << puntualesPorOficina[0] << " empleados puntuales)\n";
+                        } else {
+                            cout << "Promedio de Contabilidad: No hay empleados puntuales\n";
+                        }
+
+                        if (puntualesPorOficina[1] > 0) {
+                            const double promedio = sumaHorasPorOficina[1] / puntualesPorOficina[1];
+                            cout << "Promedio de Sistemas: " << promedio << " hrs ("
+                                    << puntualesPorOficina[1] << " empleados puntuales)\n";
+                        } else {
+                            cout << "Promedio de Sistemas: No hay empleados puntuales\n";
+                        }
+
+                        if (puntualesPorOficina[2] > 0) {
+                            const double promedio = sumaHorasPorOficina[2] / puntualesPorOficina[2];
+                            cout << "Promedio de Logística: " << promedio << " hrs ("
+                                    << puntualesPorOficina[2] << " empleados puntuales)\n";
+                        } else {
+                            cout << "Promedio de Logística: No hay empleados puntuales\n";
+                        }
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "\nPresione ENTER para continuar...";
+                        cin.get();
+                        break;
+                    }
+                    case 3: {
+                        if (empleadosConTardanza.empty()) {
+                            cout << "\n⚠️ No hay empleados con tardanzas." << endl;
+                            break;
+                        }
+                        double totalHorasDescontadas{};
+                        double totalValorDescuentos{};
+                        cout << "\n=== REPORTE DE TARDANZA ===\n";
+                        cout << fixed << setprecision(2);
+
+                        for (const short indiceEmpleado: empleadosConTardanza) {
+                            const float tardanza = datosEmpleados[indiceEmpleado][1];
+                            totalHorasDescontadas += tardanza / 60.0f;
+                            totalValorDescuentos += datosEmpleados[indiceEmpleado][4];
+
+                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
+                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
+                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
+                            cout << "Valor Salarial: $" << datosEmpleados[indiceEmpleado][2] << "/hr" << endl;
+                            cout << "Horas Totales: " << datosEmpleados[indiceEmpleado][0] << endl;
+                            cout << "Minutos de Tardanza: " << tardanza << " mins" << endl;
+                            cout << "Horas descontadas: " << (tardanza / 60.0f) << " hrs" << endl;
+                            cout << "Horas netas de Trabajo: " << datosEmpleados[indiceEmpleado][3] << endl;
+                            cout << "Valor descuento afectado: $" << datosEmpleados[indiceEmpleado][4] << endl;
+                            cout << "Salario Neto a Cancelar: $" << datosEmpleados[indiceEmpleado][5] << endl;
+                        }
+
+                        cout << "\n=== TOTAL DESCUENTOS ===\n";
+                        cout << fixed << setprecision(2);
+                        cout << "Total Horas Descontadas: " << totalHorasDescontadas << endl;
+                        cout << "Total Valor Descontado: $" << totalValorDescuentos << endl;
+
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "\nPresione ENTER para continuar...";
+                        cin.get();
+                        break;
+                    }
+                }
                 break;
             }
             case 4:
