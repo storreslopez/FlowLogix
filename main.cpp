@@ -10,6 +10,12 @@
 #error "Este programa requiere Windows para funcionar."
 #endif
 
+#define RESET "\033[0m"
+#define BRIGHT_CYAN "\033[96m"
+#define BRIGHT_YELLOW "\033[93m"
+#define BRIGHT_GREEN "\033[92m"
+#define BRIGHT_RED "\033[91m"
+#define BRIGHT_BLUE "\033[94m"
 
 using namespace std;
 
@@ -30,11 +36,11 @@ int main() {
         if (cin.fail()) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "❌ Error: Ingrese un entero valido." << "\n" << endl;
+            cout << BRIGHT_RED << "❌ Error: Ingrese un entero valido." << RESET << "\n" << endl;
         } else if (numeroEmpleados > 0) {
             numeroValido = true;
         } else {
-            cout << "❌ Error: El numero de empleados debe ser mayor a 0." << "\n" << endl;
+            cout << BRIGHT_RED << "❌ Error: El numero de empleados debe ser mayor a 0." << RESET << "\n" << endl;
         }
     }
     system("clear || cls");
@@ -45,33 +51,86 @@ int main() {
     vector<short> empleadosConTardanza;
     vector<short> empleadosPuntuales;
 
-    // Declaramos para evitar nullptr
     double sumaHorasPorOficina[3] = {0.0, 0.0, 0.0};
     int puntualesPorOficina[3] = {0, 0, 0};
 
     float datosEmpleados[numeroEmpleados][NUMERO_DATOS];
-    // datosNum[i][0] → horas trabajadas
-    // datosNum[i][1] → minutos tardanza
-    // datosNum[i][2] → valor hora
-    // datosNum[i][3] → horas netas trabajadas
-    // datosNum[i][4] → valor descontado
-    // datosNum[i][5] → salario neto
+
+    // ========== DUMMY DATA FOR TESTING - REMOVE WHEN DONE ==========
+    if (numeroEmpleados >= 10) {
+        codigos[0] = 1001; nombres[0] = "Juan Perez"; oficina[0] = 'C';
+        datosEmpleados[0][0] = 40.0f; datosEmpleados[0][1] = 30.0f; datosEmpleados[0][2] = 25000.0f;
+        datosEmpleados[0][3] = 39.5f; datosEmpleados[0][4] = 12500.0f; datosEmpleados[0][5] = 987500.0f;
+        empleadosConTardanza.push_back(0);
+
+        codigos[1] = 1002; nombres[1] = "Maria Garcia"; oficina[1] = 'S';
+        datosEmpleados[1][0] = 35.0f; datosEmpleados[1][1] = 0.0f; datosEmpleados[1][2] = 30000.0f;
+        datosEmpleados[1][3] = 35.0f; datosEmpleados[1][4] = 0.0f; datosEmpleados[1][5] = 1050000.0f;
+        empleadosPuntuales.push_back(1);
+        sumaHorasPorOficina[1] += 35.0f; puntualesPorOficina[1]++;
+
+        codigos[2] = 1003; nombres[2] = "Carlos Rodriguez"; oficina[2] = 'L';
+        datosEmpleados[2][0] = 42.0f; datosEmpleados[2][1] = 120.0f; datosEmpleados[2][2] = 22000.0f;
+        datosEmpleados[2][3] = 40.0f; datosEmpleados[2][4] = 44000.0f; datosEmpleados[2][5] = 880000.0f;
+        empleadosConTardanza.push_back(2);
+
+        codigos[3] = 1004; nombres[3] = "Ana Martinez"; oficina[3] = 'C';
+        datosEmpleados[3][0] = 38.0f; datosEmpleados[3][1] = 0.0f; datosEmpleados[3][2] = 28000.0f;
+        datosEmpleados[3][3] = 38.0f; datosEmpleados[3][4] = 0.0f; datosEmpleados[3][5] = 1064000.0f;
+        empleadosPuntuales.push_back(3);
+        sumaHorasPorOficina[0] += 38.0f; puntualesPorOficina[0]++;
+
+        codigos[4] = 1005; nombres[4] = "Luis Fernandez"; oficina[4] = 'S';
+        datosEmpleados[4][0] = 40.0f; datosEmpleados[4][1] = 90.0f; datosEmpleados[4][2] = 32000.0f;
+        datosEmpleados[4][3] = 38.5f; datosEmpleados[4][4] = 48000.0f; datosEmpleados[4][5] = 1232000.0f;
+        empleadosConTardanza.push_back(4);
+
+        codigos[5] = 1006; nombres[5] = "Sofia Lopez"; oficina[5] = 'L';
+        datosEmpleados[5][0] = 36.0f; datosEmpleados[5][1] = 0.0f; datosEmpleados[5][2] = 24000.0f;
+        datosEmpleados[5][3] = 36.0f; datosEmpleados[5][4] = 0.0f; datosEmpleados[5][5] = 864000.0f;
+        empleadosPuntuales.push_back(5);
+        sumaHorasPorOficina[2] += 36.0f; puntualesPorOficina[2]++;
+
+        codigos[6] = 1007; nombres[6] = "Pedro Sanchez"; oficina[6] = 'C';
+        datosEmpleados[6][0] = 39.0f; datosEmpleados[6][1] = 45.0f; datosEmpleados[6][2] = 26000.0f;
+        datosEmpleados[6][3] = 38.25f; datosEmpleados[6][4] = 19500.0f; datosEmpleados[6][5] = 994500.0f;
+        empleadosConTardanza.push_back(6);
+
+        codigos[7] = 1008; nombres[7] = "Laura Torres"; oficina[7] = 'S';
+        datosEmpleados[7][0] = 37.0f; datosEmpleados[7][1] = 0.0f; datosEmpleados[7][2] = 31000.0f;
+        datosEmpleados[7][3] = 37.0f; datosEmpleados[7][4] = 0.0f; datosEmpleados[7][5] = 1147000.0f;
+        empleadosPuntuales.push_back(7);
+        sumaHorasPorOficina[1] += 37.0f; puntualesPorOficina[1]++;
+
+        codigos[8] = 1009; nombres[8] = "Roberto Jimenez"; oficina[8] = 'L';
+        datosEmpleados[8][0] = 41.0f; datosEmpleados[8][1] = 180.0f; datosEmpleados[8][2] = 23000.0f;
+        datosEmpleados[8][3] = 38.0f; datosEmpleados[8][4] = 69000.0f; datosEmpleados[8][5] = 874000.0f;
+        empleadosConTardanza.push_back(8);
+
+        codigos[9] = 1010; nombres[9] = "Carmen Ruiz"; oficina[9] = 'C';
+        datosEmpleados[9][0] = 35.5f; datosEmpleados[9][1] = 0.0f; datosEmpleados[9][2] = 27000.0f;
+        datosEmpleados[9][3] = 35.5f; datosEmpleados[9][4] = 0.0f; datosEmpleados[9][5] = 958500.0f;
+        empleadosPuntuales.push_back(9);
+        sumaHorasPorOficina[0] += 35.5f; puntualesPorOficina[0]++;
+    }
+    // ========== END DUMMY DATA ==========
 
     bool continua = true;
     while (continua) {
         cout << endl;
-        cout << setw(50) << right << "EMPRESA FLOWLOGIX" << endl;
+        cout << BRIGHT_CYAN << setw(50) << right << "EMPRESA FLOWLOGIX" << RESET << endl;
         cout << setw(55) << right << "Puntualidad que impulsa tu empresa." << endl;
-        cout << setw(50) << right << "REGISTRO DE TARDANZA" << endl;
+        cout << BRIGHT_CYAN << setw(50) << right << "REGISTRO DE TARDANZA" << RESET << endl;
         cout << endl;
-
-        cout << "1. " << "Registra informacion de empleados" << endl;
-        cout << "2. " << "Consultar empleado" << endl;
-        cout << "3. " << "Reportes" << endl;
-        cout << setw(4) << "" << "3.1 Reporte de empleados con registro de tardanza" << endl;
-        cout << setw(4) << "" << "3.2 Reporte de empleados puntuales" << endl;
-        cout << setw(4) << "" << "3.3 Reporte descuento tiempo tardanza" << endl;
-        cout << "4. " << "Salir" << endl;
+        cout << string(60, '=') << endl;
+        cout << BRIGHT_YELLOW << "1. " << RESET << "Registra informacion de empleados" << endl;
+        cout << BRIGHT_YELLOW << "2. " << RESET << "Consultar empleado" << endl;
+        cout << BRIGHT_YELLOW << "3. " << RESET << "Reportes" << endl;
+        cout << setw(4) << "" << BRIGHT_YELLOW << "3.1 " << RESET << "Reporte de empleados con registro de tardanza" << endl;
+        cout << setw(4) << "" << BRIGHT_YELLOW << "3.2 " << RESET << "Reporte de empleados puntuales" << endl;
+        cout << setw(4) << "" << BRIGHT_YELLOW << "3.3 " << RESET << "Reporte descuento tiempo tardanza" << endl;
+        cout << BRIGHT_YELLOW << "4. " << RESET << "Salir" << endl;
+        cout << string(60, '=') << endl;
         cout << endl;
 
         short opcionMenu;
@@ -84,11 +143,11 @@ int main() {
             if (cin.fail()) {
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "❌ Error: Ingrese un entero valido.\n" << endl;
+                cout << BRIGHT_RED << "❌ Error: Ingrese un entero valido.\n" << RESET << endl;
             } else if (opcionMenu >= 1 && opcionMenu <= 4) {
                 opcionMenuValida = true;
             } else {
-                cout << "❌ Error: Ingrese una opcion valida [1-4]\n" << endl;
+                cout << BRIGHT_RED << "❌ Error: Ingrese una opcion valida [1-4]\n" << RESET << endl;
             }
         }
 
@@ -106,12 +165,12 @@ int main() {
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "❌ Error: Ingrese un entero valido.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un entero valido.\n" << RESET << endl;
                             continue;
                         }
 
                         if (codigoEmpleado < 1) {
-                            cout << "❌ Error: El código debe ser mayor o igual a 1.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: El código debe ser mayor o igual a 1.\n" << RESET << endl;
                             continue;
                         }
 
@@ -124,7 +183,7 @@ int main() {
                         }
 
                         if (codigoExiste) {
-                            cout << "❌ Error: Este codigo ya ha sido registrado.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Este codigo ya ha sido registrado.\n" << RESET << endl;
                             continue;
                         }
 
@@ -148,7 +207,7 @@ int main() {
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "❌ Error: Ingrese un caracter valido.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un caracter valido.\n" << RESET << endl;
                             continue;
                         }
 
@@ -157,7 +216,7 @@ int main() {
                         if (oficinaEmpleado == 'C' || oficinaEmpleado == 'S' || oficinaEmpleado == 'L') {
                             oficinaValida = true;
                         } else {
-                            cout << "❌ Error: Opción no válida. Ingrese C, S o L.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Opción no válida. Ingrese C, S o L.\n" << RESET << endl;
                         }
                     }
                     oficina[i] = oficinaEmpleado;
@@ -171,15 +230,14 @@ int main() {
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "❌ Error: Ingrese un float valido.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un float valido.\n" << RESET << endl;
                         } else if (horasSemanales > 0) {
                             horasValidas = true;
                         } else {
-                            cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un valor positivo.\n" << RESET << endl;
                         }
                     }
                     datosEmpleados[i][0] = horasSemanales;
-
 
                     float minutosTardanza;
                     bool minutosValidos = false;
@@ -190,11 +248,11 @@ int main() {
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "❌ Error: Ingrese un float valido.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un float valido.\n" << RESET << endl;
                         } else if (minutosTardanza >= 0) {
                             minutosValidos = true;
                         } else {
-                            cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un valor positivo.\n" << RESET << endl;
                         }
                     }
                     datosEmpleados[i][1] = minutosTardanza;
@@ -231,11 +289,11 @@ int main() {
                         if (cin.fail()) {
                             cin.clear();
                             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            cout << "❌ Error: Ingrese un float valido.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un float valido.\n" << RESET << endl;
                         } else if (valorHora > 0) {
                             valorHoraValido = true;
                         } else {
-                            cout << "❌ Error: Ingrese un valor positivo.\n" << endl;
+                            cout << BRIGHT_RED << "❌ Error: Ingrese un valor positivo.\n" << RESET << endl;
                         }
                     }
                     datosEmpleados[i][2] = valorHora;
@@ -256,12 +314,12 @@ int main() {
                     if (cin.fail()) {
                         cin.clear();
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        cout << "❌ Error: Ingrese un entero valido.\n" << endl;
+                        cout << BRIGHT_RED << "❌ Error: Ingrese un entero valido.\n" << RESET << endl;
                         continue;
                     }
 
                     if (codigoEmpleado < 1) {
-                        cout << "❌ Error: El código debe ser mayor o igual a 1.\n" << endl;
+                        cout << BRIGHT_RED << "❌ Error: El código debe ser mayor o igual a 1.\n" << RESET << endl;
                         continue;
                     }
 
@@ -294,44 +352,35 @@ int main() {
 
                     cout << fixed << setprecision(2);
 
-                    cout << "\n╔════════════════════════════════════════════════════════════════╗\n";
-                    cout << "║           INFORMACIÓN DETALLADA DEL EMPLEADO                   ║\n";
-                    cout << "╚════════════════════════════════════════════════════════════════╝\n\n";
+                    cout << "\n" << BRIGHT_CYAN << string(70, '=') << RESET << "\n";
+                    cout << BRIGHT_CYAN << "|" << RESET << setw(35) << right << "INFORMACIÓN DETALLADA DEL EMPLEADO" << setw(33) << "" << BRIGHT_CYAN << "|" << RESET << "\n";
+                    cout << BRIGHT_CYAN << string(70, '=') << RESET << "\n\n";
 
-                    cout << left << setw(30) << "  Código del empleado:" << codigoEmpleado << "\n";
-                    cout << left << setw(30) << "  Nombre completo:" << nombres[empleadoIndex] << "\n";
-                    cout << left << setw(30) << "  Oficina:" << oficinaEmpleado << "\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Código del empleado:" << RESET << right << setw(38) << codigoEmpleado << "\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Nombre completo:" << RESET << right << setw(38) << nombres[empleadoIndex] << "\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Oficina:" << RESET << right << setw(38) << oficinaEmpleado << "\n";
 
-                    cout << "\n" << string(64, '-') << "\n";
-                    cout << "  INFORMACIÓN LABORAL\n";
-                    cout << string(64, '-') << "\n\n";
+                    cout << "\n" << string(70, '-') << "\n";
+                    cout << BRIGHT_YELLOW << "  INFORMACIÓN LABORAL" << RESET << "\n";
+                    cout << string(70, '-') << "\n\n";
 
-                    cout << left << setw(30) << "  Valor por hora:" << right << setw(10) << "$" << datosEmpleados[
-                        empleadoIndex][2] << "\n";
-                    cout << left << setw(30) << "  Horas semanales trabajadas:" << right << setw(10) << datosEmpleados[
-                        empleadoIndex][0] << " hrs\n";
-                    cout << left << setw(30) << "  Minutos de tardanza semanal:" << right << setw(10) << datosEmpleados[
-                        empleadoIndex][1] << " min\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Valor por hora:" << RESET << right << setw(10) << "$" << setw(28) << datosEmpleados[empleadoIndex][2] << "\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Horas semanales trabajadas:" << RESET << right << setw(10) << datosEmpleados[empleadoIndex][0] << setw(28) << " hrs\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Minutos de tardanza semanal:" << RESET << right << setw(10) << datosEmpleados[empleadoIndex][1] << setw(28) << " min\n";
 
-                    cout << "\n" << string(64, '-') << "\n";
-                    cout << "  CÁLCULOS SALARIALES\n";
-                    cout << string(64, '-') << "\n\n";
+                    cout << "\n" << string(70, '-') << "\n";
+                    cout << BRIGHT_YELLOW << "  CÁLCULOS SALARIALES" << RESET << "\n";
+                    cout << string(70, '-') << "\n\n";
 
-                    cout << left << setw(30) << "  Horas descontadas:" << right << setw(10) << (
-                        datosEmpleados[empleadoIndex][1] / 60.0) << " hrs\n";
-                    cout << left << setw(30) << "  Horas netas de trabajo:" << right << setw(10) << datosEmpleados[
-                        empleadoIndex][3] << " hrs\n";
-                    cout << left << setw(30) << "  Valor descuento efectuado:" << right << setw(10) << "$" <<
-                            datosEmpleados[
-                                empleadoIndex][4] << "\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Horas descontadas:" << RESET << right << setw(10) << (datosEmpleados[empleadoIndex][1] / 60.0) << setw(28) << " hrs\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Horas netas de trabajo:" << RESET << right << setw(10) << datosEmpleados[empleadoIndex][3] << setw(28) << " hrs\n";
+                    cout << BRIGHT_YELLOW << left << setw(30) << "  Valor descuento efectuado:" << RESET << right << setw(10) << "$" << setw(28) << datosEmpleados[empleadoIndex][4] << "\n";
 
-                    cout << "\n" << string(64, '-') << "\n";
-                    cout << left << setw(30) << "  SALARIO NETO A CANCELAR:" << right << setw(10) << "$" <<
-                            datosEmpleados[
-                                empleadoIndex][5] << "\n";
-                    cout << string(64, '-') << "\n\n";
+                    cout << "\n" << string(70, '=') << "\n";
+                    cout << BRIGHT_GREEN << left << setw(30) << "  SALARIO NETO A CANCELAR:" << RESET << right << setw(10) << "$" << setw(28) << datosEmpleados[empleadoIndex][5] << "\n";
+                    cout << string(70, '=') << "\n\n";
                 } else {
-                    cout << "❌ Error: No hay ningun empleado con ese ID!\n" << endl;
+                    cout << BRIGHT_RED << "❌ Error: No hay ningun empleado con ese ID!\n" << RESET << endl;
                 }
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 cout << "\nPresione ENTER para continuar...";
@@ -340,9 +389,13 @@ int main() {
                 break;
             }
             case 3: {
-                cout << "1 Reporte de empleados con registro de tardanza" << endl;
-                cout << "2 Reporte de empleados puntuales" << endl;
-                cout << "3 Reporte descuento tiempo tardanza" << endl;
+                cout << BRIGHT_CYAN << string(60, '=') << RESET << "\n";
+                cout << BRIGHT_CYAN << setw(30) << right << "MENÚ DE REPORTES" << RESET << "\n";
+                cout << BRIGHT_CYAN << string(60, '=') << RESET << "\n";
+                cout << BRIGHT_YELLOW << "1. " << RESET << "Reporte de empleados con registro de tardanza" << endl;
+                cout << BRIGHT_YELLOW << "2. " << RESET << "Reporte de empleados puntuales" << endl;
+                cout << BRIGHT_YELLOW << "3. " << RESET << "Reporte descuento tiempo tardanza" << endl;
+                cout << BRIGHT_CYAN << string(60, '=') << RESET << "\n";
 
                 short opcionSubMenu;
                 bool opcionSubMenuValida = false;
@@ -353,11 +406,11 @@ int main() {
                     if (cin.fail()) {
                         cin.clear();
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                        cout << "❌ Error: Ingrese un entero valido.\n" << endl;
+                        cout << BRIGHT_RED << "❌ Error: Ingrese un entero valido.\n" << RESET << endl;
                     } else if (opcionSubMenu >= 1 && opcionSubMenu <= 3) {
                         opcionSubMenuValida = true;
                     } else {
-                        cout << "❌ Error: Opcion fuera del rango (1-3).\n" << endl;
+                        cout << BRIGHT_RED << "❌ Error: Opcion fuera del rango (1-3).\n" << RESET << endl;
                     }
                 }
 
@@ -365,7 +418,7 @@ int main() {
                 switch (opcionSubMenu) {
                     case 1: {
                         if (empleadosConTardanza.empty()) {
-                            cout << "\n⚠️ No hay empleados con tardanzas." << endl;
+                            cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados con tardanzas." << RESET << endl;
                             break;
                         }
 
@@ -373,8 +426,13 @@ int main() {
                         short indiceConMenorTardanza = empleadosConTardanza[0];
                         double sumaTardanzas = 0.0;
 
-                        cout << "\n=== EMPLEADOS CON TARDANZA ===\n";
+                        cout << "\n" << BRIGHT_CYAN << string(100, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << setw(50) << right << "EMPLEADOS CON TARDANZA" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(100, '=') << RESET << "\n\n";
+
                         cout << fixed << setprecision(2);
+                        cout << BRIGHT_YELLOW << left << setw(12) << "CODIGO" << setw(25) << "NOMBRE" << setw(15) << "DEPENDENCIA" << right << setw(15) << "MIN. TARDANZA" << setw(18) << "HRS. TARDANZA" << RESET << "\n";
+                        cout << string(100, '-') << "\n";
 
                         for (const short indiceEmpleado: empleadosConTardanza) {
                             const float tardanza = datosEmpleados[indiceEmpleado][1];
@@ -388,26 +446,29 @@ int main() {
                                 indiceConMenorTardanza = indiceEmpleado;
                             }
 
-                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
-                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
-                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
-                            cout << "Minutos de Tardanza: " << tardanza << " mins" << endl;
-                            cout << "Horas de Tardanza: " << (tardanza / 60.0f) << " hrs" << endl;
+                            string depStr;
+                            switch (oficina[indiceEmpleado]) {
+                                case 'C': depStr = "Contabilidad"; break;
+                                case 'S': depStr = "Sistemas"; break;
+                                case 'L': depStr = "Logistica"; break;
+                            }
+
+                            cout << left << setw(12) << codigos[indiceEmpleado] << setw(25) << nombres[indiceEmpleado] << setw(15) << depStr << right << setw(15) << tardanza << " mins" << setw(12) << (tardanza / 60.0f) << " hrs" << "\n";
                         }
 
                         if (!empleadosPuntuales.empty()) {
                             indiceConMenorTardanza = empleadosPuntuales[0];
                         }
 
-                        const double promedioTardanza =
-                                sumaTardanzas / static_cast<double>(empleadosConTardanza.size());
+                        const double promedioTardanza = sumaTardanzas / static_cast<double>(empleadosConTardanza.size());
 
-                        cout << "\n=== RESUMEN ===\n";
-                        cout << "Empleado con MAYOR tardanza: " << nombres[indiceConMayorTardanza]
-                                << " (" << datosEmpleados[indiceConMayorTardanza][1] << " mins)\n";
-                        cout << "Empleado con MENOR tardanza: " << nombres[indiceConMenorTardanza]
-                                << " (" << datosEmpleados[indiceConMenorTardanza][1] << " mins)\n";
-                        cout << "Promedio de tardanzas: " << promedioTardanza << " mins\n";
+                        cout << string(100, '-') << "\n";
+                        cout << BRIGHT_CYAN << string(100, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << setw(50) << right << "RESUMEN ESTADÍSTICO" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(100, '=') << RESET << "\n";
+                        cout << BRIGHT_YELLOW << left << setw(40) << "  Empleado con MAYOR tardanza:" << RESET << nombres[indiceConMayorTardanza] << " (" << datosEmpleados[indiceConMayorTardanza][1] << " mins)\n";
+                        cout << BRIGHT_YELLOW << left << setw(40) << "  Empleado con MENOR tardanza:" << RESET << nombres[indiceConMenorTardanza] << " (" << datosEmpleados[indiceConMenorTardanza][1] << " mins)\n";
+                        cout << BRIGHT_YELLOW << left << setw(40) << "  Promedio de tardanzas:" << RESET << fixed << setprecision(2) << promedioTardanza << " mins\n";
 
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                         cout << "\nPresione ENTER para continuar...";
@@ -416,43 +477,55 @@ int main() {
                     }
                     case 2: {
                         if (empleadosPuntuales.empty()) {
-                            cout << "\n⚠️ No hay empleados puntuales!\n" << endl;
+                            cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados puntuales!\n" << RESET << endl;
                             break;
                         }
 
-                        cout << "\n=== EMPLEADOS PUNTUALES ===\n";
+                        cout << "\n" << BRIGHT_CYAN << string(90, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << setw(45) << right << "EMPLEADOS PUNTUALES" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(90, '=') << RESET << "\n\n";
+
                         cout << fixed << setprecision(2);
+                        cout << BRIGHT_YELLOW << left << setw(12) << "CODIGO" << setw(25) << "NOMBRE" << setw(20) << "DEPENDENCIA" << right << setw(18) << "HORAS TRABAJADAS" << RESET << "\n";
+                        cout << string(90, '-') << "\n";
 
                         for (const short indiceEmpleado: empleadosPuntuales) {
-                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
-                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
-                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
-                            cout << "Horas Trabajadas: " << datosEmpleados[indiceEmpleado][2] << " hrs" << endl;
+                            string depStr;
+                            switch (oficina[indiceEmpleado]) {
+                                case 'C': depStr = "Contabilidad"; break;
+                                case 'S': depStr = "Sistemas"; break;
+                                case 'L': depStr = "Logistica"; break;
+                            }
+
+                            cout << left << setw(12) << codigos[indiceEmpleado] << setw(25) << nombres[indiceEmpleado] << setw(20) << depStr << right << setw(15) << datosEmpleados[indiceEmpleado][0] << " hrs" << "\n";
                         }
+
+                        cout << string(90, '-') << "\n";
+                        cout << BRIGHT_CYAN << string(90, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << setw(45) << right << "PROMEDIOS POR OFICINA" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(90, '=') << RESET << "\n";
 
                         if (puntualesPorOficina[0] > 0) {
                             const double promedio = sumaHorasPorOficina[0] / puntualesPorOficina[0];
-                            cout << "Promedio de Contabilidad: " << promedio << " hrs ("
-                                    << puntualesPorOficina[0] << " empleados puntuales)\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Contabilidad:" << RESET << right << setw(15) << fixed << setprecision(2) << promedio << " hrs (" << puntualesPorOficina[0] << " empleados puntuales)\n";
                         } else {
-                            cout << "Promedio de Contabilidad: No hay empleados puntuales\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Contabilidad:" << RESET << "No hay empleados puntuales\n";
                         }
 
                         if (puntualesPorOficina[1] > 0) {
                             const double promedio = sumaHorasPorOficina[1] / puntualesPorOficina[1];
-                            cout << "Promedio de Sistemas: " << promedio << " hrs ("
-                                    << puntualesPorOficina[1] << " empleados puntuales)\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Sistemas:" << RESET << right << setw(15) << fixed << setprecision(2) << promedio << " hrs (" << puntualesPorOficina[1] << " empleados puntuales)\n";
                         } else {
-                            cout << "Promedio de Sistemas: No hay empleados puntuales\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Sistemas:" << RESET << "No hay empleados puntuales\n";
                         }
 
                         if (puntualesPorOficina[2] > 0) {
                             const double promedio = sumaHorasPorOficina[2] / puntualesPorOficina[2];
-                            cout << "Promedio de Logística: " << promedio << " hrs ("
-                                    << puntualesPorOficina[2] << " empleados puntuales)\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Logística:" << RESET << right << setw(16) << fixed << setprecision(2) << promedio << " hrs (" << puntualesPorOficina[2] << " empleados puntuales)\n";
                         } else {
-                            cout << "Promedio de Logística: No hay empleados puntuales\n";
+                            cout << BRIGHT_YELLOW << left << setw(35) << "  Promedio de Logística:" << RESET << "No hay empleados puntuales\n";
                         }
+
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                         cout << "\nPresione ENTER para continuar...";
                         cin.get();
@@ -460,35 +533,40 @@ int main() {
                     }
                     case 3: {
                         if (empleadosConTardanza.empty()) {
-                            cout << "\n⚠️ No hay empleados con tardanzas." << endl;
+                            cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados con tardanzas." << RESET << endl;
                             break;
                         }
                         double totalHorasDescontadas{};
                         double totalValorDescuentos{};
-                        cout << "\n=== REPORTE DE TARDANZA ===\n";
+                        cout << "\n" << BRIGHT_CYAN << string(120, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << setw(60) << right << "REPORTE DESCUENTO TIEMPO TARDANZA" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(120, '=') << RESET << "\n\n";
+
                         cout << fixed << setprecision(2);
+                        cout << BRIGHT_YELLOW << left << setw(10) << "CODIGO" << setw(20) << "NOMBRE" << setw(13) << "DEPENDENCIA" << right << setw(11) << "VALOR/HR" << setw(11) << "HRS TRAB" << setw(11) << "MIN TARD" << setw(11) << "HRS DESC" << setw(11) << "HRS NETAS" << setw(11) << "VAL DESC" << setw(11) << "SAL NETO" << RESET << "\n";
+                        cout << string(120, '-') << "\n";
 
                         for (const short indiceEmpleado: empleadosConTardanza) {
                             const float tardanza = datosEmpleados[indiceEmpleado][1];
                             totalHorasDescontadas += tardanza / 60.0f;
                             totalValorDescuentos += datosEmpleados[indiceEmpleado][4];
 
-                            cout << "\nCodigo: " << codigos[indiceEmpleado] << endl;
-                            cout << "Nombre: " << nombres[indiceEmpleado] << endl;
-                            cout << "Dependencia: " << oficina[indiceEmpleado] << endl;
-                            cout << "Valor Salarial: $" << datosEmpleados[indiceEmpleado][2] << "/hr" << endl;
-                            cout << "Horas Totales: " << datosEmpleados[indiceEmpleado][0] << endl;
-                            cout << "Minutos de Tardanza: " << tardanza << " mins" << endl;
-                            cout << "Horas descontadas: " << (tardanza / 60.0f) << " hrs" << endl;
-                            cout << "Horas netas de Trabajo: " << datosEmpleados[indiceEmpleado][3] << endl;
-                            cout << "Valor descuento afectado: $" << datosEmpleados[indiceEmpleado][4] << endl;
-                            cout << "Salario Neto a Cancelar: $" << datosEmpleados[indiceEmpleado][5] << endl;
+                            string depStr;
+                            switch (oficina[indiceEmpleado]) {
+                                case 'C': depStr = "Contabilidad"; break;
+                                case 'S': depStr = "Sistemas"; break;
+                                case 'L': depStr = "Logistica"; break;
+                            }
+
+                            cout << left << setw(10) << codigos[indiceEmpleado] << setw(20) << nombres[indiceEmpleado] << setw(13) << depStr << right << setw(1) << "$" << setw(10) << datosEmpleados[indiceEmpleado][2] << setw(11) << datosEmpleados[indiceEmpleado][0] << setw(11) << tardanza << setw(11) << (tardanza / 60.0f) << setw(11) << datosEmpleados[indiceEmpleado][3] << setw(1) << "$" << setw(10) << datosEmpleados[indiceEmpleado][4] << setw(1) << "$" << setw(10) << datosEmpleados[indiceEmpleado][5] << "\n";
                         }
 
-                        cout << "\n=== TOTAL DESCUENTOS ===\n";
-                        cout << fixed << setprecision(2);
-                        cout << "Total Horas Descontadas: " << totalHorasDescontadas << endl;
-                        cout << "Total Valor Descontado: $" << totalValorDescuentos << endl;
+                        cout << string(120, '-') << "\n";
+                        cout << BRIGHT_CYAN << string(120, '=') << RESET << "\n";
+                        cout << BRIGHT_CYAN << left << setw(43) << "" << right << setw(34) << "TOTALES" << RESET << "\n";
+                        cout << BRIGHT_CYAN << string(120, '=') << RESET << "\n";
+                        cout << BRIGHT_GREEN << left << setw(43) << "  Total Horas Descontadas:" << RESET << right << setw(33) << "" << fixed << setprecision(2) << totalHorasDescontadas << " hrs\n";
+                        cout << BRIGHT_GREEN << left << setw(43) << "  Total Valor Descontado:" << RESET << right << setw(33) << "" << "$" << setw(10) << fixed << setprecision(2) << totalValorDescuentos << "\n";
 
                         cin.ignore(numeric_limits<streamsize>::max(), '\n');
                         cout << "\nPresione ENTER para continuar...";
@@ -503,7 +581,6 @@ int main() {
                 break;
         }
     }
-
 
     return 0;
 }
