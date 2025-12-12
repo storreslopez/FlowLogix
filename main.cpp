@@ -55,65 +55,7 @@ int main() {
     int puntualesPorOficina[3] = {0, 0, 0};
 
     float datosEmpleados[numeroEmpleados][NUMERO_DATOS];
-
-    // ========== DUMMY DATA FOR TESTING - REMOVE WHEN DONE ==========
-    if (numeroEmpleados >= 10) {
-        codigos[0] = 1001; nombres[0] = "Juan Perez"; oficina[0] = 'C';
-        datosEmpleados[0][0] = 40.0f; datosEmpleados[0][1] = 30.0f; datosEmpleados[0][2] = 25000.0f;
-        datosEmpleados[0][3] = 39.5f; datosEmpleados[0][4] = 12500.0f; datosEmpleados[0][5] = 987500.0f;
-        empleadosConTardanza.push_back(0);
-
-        codigos[1] = 1002; nombres[1] = "Maria Garcia"; oficina[1] = 'S';
-        datosEmpleados[1][0] = 35.0f; datosEmpleados[1][1] = 0.0f; datosEmpleados[1][2] = 30000.0f;
-        datosEmpleados[1][3] = 35.0f; datosEmpleados[1][4] = 0.0f; datosEmpleados[1][5] = 1050000.0f;
-        empleadosPuntuales.push_back(1);
-        sumaHorasPorOficina[1] += 35.0f; puntualesPorOficina[1]++;
-
-        codigos[2] = 1003; nombres[2] = "Carlos Rodriguez"; oficina[2] = 'L';
-        datosEmpleados[2][0] = 42.0f; datosEmpleados[2][1] = 120.0f; datosEmpleados[2][2] = 22000.0f;
-        datosEmpleados[2][3] = 40.0f; datosEmpleados[2][4] = 44000.0f; datosEmpleados[2][5] = 880000.0f;
-        empleadosConTardanza.push_back(2);
-
-        codigos[3] = 1004; nombres[3] = "Ana Martinez"; oficina[3] = 'C';
-        datosEmpleados[3][0] = 38.0f; datosEmpleados[3][1] = 0.0f; datosEmpleados[3][2] = 28000.0f;
-        datosEmpleados[3][3] = 38.0f; datosEmpleados[3][4] = 0.0f; datosEmpleados[3][5] = 1064000.0f;
-        empleadosPuntuales.push_back(3);
-        sumaHorasPorOficina[0] += 38.0f; puntualesPorOficina[0]++;
-
-        codigos[4] = 1005; nombres[4] = "Luis Fernandez"; oficina[4] = 'S';
-        datosEmpleados[4][0] = 40.0f; datosEmpleados[4][1] = 90.0f; datosEmpleados[4][2] = 32000.0f;
-        datosEmpleados[4][3] = 38.5f; datosEmpleados[4][4] = 48000.0f; datosEmpleados[4][5] = 1232000.0f;
-        empleadosConTardanza.push_back(4);
-
-        codigos[5] = 1006; nombres[5] = "Sofia Lopez"; oficina[5] = 'L';
-        datosEmpleados[5][0] = 36.0f; datosEmpleados[5][1] = 0.0f; datosEmpleados[5][2] = 24000.0f;
-        datosEmpleados[5][3] = 36.0f; datosEmpleados[5][4] = 0.0f; datosEmpleados[5][5] = 864000.0f;
-        empleadosPuntuales.push_back(5);
-        sumaHorasPorOficina[2] += 36.0f; puntualesPorOficina[2]++;
-
-        codigos[6] = 1007; nombres[6] = "Pedro Sanchez"; oficina[6] = 'C';
-        datosEmpleados[6][0] = 39.0f; datosEmpleados[6][1] = 45.0f; datosEmpleados[6][2] = 26000.0f;
-        datosEmpleados[6][3] = 38.25f; datosEmpleados[6][4] = 19500.0f; datosEmpleados[6][5] = 994500.0f;
-        empleadosConTardanza.push_back(6);
-
-        codigos[7] = 1008; nombres[7] = "Laura Torres"; oficina[7] = 'S';
-        datosEmpleados[7][0] = 37.0f; datosEmpleados[7][1] = 0.0f; datosEmpleados[7][2] = 31000.0f;
-        datosEmpleados[7][3] = 37.0f; datosEmpleados[7][4] = 0.0f; datosEmpleados[7][5] = 1147000.0f;
-        empleadosPuntuales.push_back(7);
-        sumaHorasPorOficina[1] += 37.0f; puntualesPorOficina[1]++;
-
-        codigos[8] = 1009; nombres[8] = "Roberto Jimenez"; oficina[8] = 'L';
-        datosEmpleados[8][0] = 41.0f; datosEmpleados[8][1] = 180.0f; datosEmpleados[8][2] = 23000.0f;
-        datosEmpleados[8][3] = 38.0f; datosEmpleados[8][4] = 69000.0f; datosEmpleados[8][5] = 874000.0f;
-        empleadosConTardanza.push_back(8);
-
-        codigos[9] = 1010; nombres[9] = "Carmen Ruiz"; oficina[9] = 'C';
-        datosEmpleados[9][0] = 35.5f; datosEmpleados[9][1] = 0.0f; datosEmpleados[9][2] = 27000.0f;
-        datosEmpleados[9][3] = 35.5f; datosEmpleados[9][4] = 0.0f; datosEmpleados[9][5] = 958500.0f;
-        empleadosPuntuales.push_back(9);
-        sumaHorasPorOficina[0] += 35.5f; puntualesPorOficina[0]++;
-    }
-    // ========== END DUMMY DATA ==========
+    bool yaRegistroEmpleados = false;
 
     bool continua = true;
     while (continua) {
@@ -155,6 +97,10 @@ int main() {
 
         switch (opcionMenu) {
             case 1: {
+                if (yaRegistroEmpleados) {
+                    cout << "\n" << BRIGHT_RED << "⚠️ Ya has registrado los empleados." << RESET << endl;
+                    break;
+                }
                 for (size_t i = 0; i < numeroEmpleados; ++i) {
                     long codigoEmpleado;
                     bool codigoValido = false;
@@ -302,9 +248,14 @@ int main() {
                     datosEmpleados[i][4] = (minutosTardanza / 60.0f) * valorHora;
                     datosEmpleados[i][5] = datosEmpleados[i][3] * valorHora;
                 }
+                yaRegistroEmpleados = true;
                 break;
             }
             case 2: {
+                if (!yaRegistroEmpleados) {
+                    cout << "\n" << BRIGHT_RED << "⚠️ Aun no has registrado ningun empleado." << RESET << endl;
+                    break;
+                }
                 long codigoEmpleado;
                 bool codigoValido = false;
                 while (!codigoValido) {
@@ -389,6 +340,10 @@ int main() {
                 break;
             }
             case 3: {
+                if (!yaRegistroEmpleados) {
+                    cout << "\n" << BRIGHT_RED << "⚠️ Aun no has registrado ningun empleado." << RESET << endl;
+                    break;
+                }
                 cout << BRIGHT_CYAN << string(60, '=') << RESET << "\n";
                 cout << BRIGHT_CYAN << setw(30) << right << "MENÚ DE REPORTES" << RESET << "\n";
                 cout << BRIGHT_CYAN << string(60, '=') << RESET << "\n";
@@ -581,6 +536,6 @@ int main() {
                 break;
         }
     }
-
+    cout << BRIGHT_BLUE << "🤗 Gracias por usar nuestro programa!" << RESET << endl;
     return 0;
 }
