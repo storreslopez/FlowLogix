@@ -2,7 +2,6 @@
 #include <iomanip>
 #include <string>
 #include <limits>
-#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -48,8 +47,10 @@ int main() {
     long codigos[numeroEmpleados];
     string nombres[numeroEmpleados];
     char oficina[numeroEmpleados];
-    vector<short> empleadosConTardanza;
-    vector<short> empleadosPuntuales;
+    short empleadosConTardanza[numeroEmpleados];
+    short numEmpleadosConTardanza = 0;
+    short empleadosPuntuales[numeroEmpleados];
+    short numEmpleadosPuntuales = 0;
 
     double sumaHorasPorOficina[3] = {0.0, 0.0, 0.0};
     int puntualesPorOficina[3] = {0, 0, 0};
@@ -203,8 +204,8 @@ int main() {
                     }
                     datosEmpleados[i][1] = minutosTardanza;
 
-                    if (minutosTardanza == 0) empleadosPuntuales.push_back(i);
-                    if (minutosTardanza > 0) empleadosConTardanza.push_back(i);
+                    if (minutosTardanza == 0) empleadosPuntuales[numEmpleadosPuntuales++] = i;
+                    if (minutosTardanza > 0) empleadosConTardanza[numEmpleadosConTardanza++] = i;
 
                     const float horasNetasTrabajadas = horasSemanales - (minutosTardanza / 60.0f);
 
@@ -372,7 +373,7 @@ int main() {
                 system("clear || cls");
                 switch (opcionSubMenu) {
                     case 1: {
-                        if (empleadosConTardanza.empty()) {
+                        if (numEmpleadosConTardanza == 0) {
                             cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados con tardanzas." << RESET << endl;
                             break;
                         }
@@ -389,7 +390,8 @@ int main() {
                         cout << BRIGHT_YELLOW << left << setw(12) << "CODIGO" << setw(25) << "NOMBRE" << setw(15) << "DEPENDENCIA" << right << setw(15) << "MIN. TARDANZA" << setw(18) << "HRS. TARDANZA" << RESET << "\n";
                         cout << string(100, '-') << "\n";
 
-                        for (const short indiceEmpleado: empleadosConTardanza) {
+                        for (short j = 0; j < numEmpleadosConTardanza; ++j) {
+                            const short indiceEmpleado = empleadosConTardanza[j];
                             const float tardanza = datosEmpleados[indiceEmpleado][1];
                             sumaTardanzas += tardanza;
 
@@ -411,11 +413,11 @@ int main() {
                             cout << left << setw(12) << codigos[indiceEmpleado] << setw(25) << nombres[indiceEmpleado] << setw(15) << depStr << right << setw(15) << tardanza << " mins" << setw(12) << (tardanza / 60.0f) << " hrs" << "\n";
                         }
 
-                        if (!empleadosPuntuales.empty()) {
+                        if (numEmpleadosPuntuales > 0) {
                             indiceConMenorTardanza = empleadosPuntuales[0];
                         }
 
-                        const double promedioTardanza = sumaTardanzas / static_cast<double>(empleadosConTardanza.size());
+                        const double promedioTardanza = sumaTardanzas / static_cast<double>(numEmpleadosConTardanza);
 
                         cout << string(100, '-') << "\n";
                         cout << BRIGHT_CYAN << string(100, '=') << RESET << "\n";
@@ -431,7 +433,7 @@ int main() {
                         break;
                     }
                     case 2: {
-                        if (empleadosPuntuales.empty()) {
+                        if (numEmpleadosPuntuales == 0) {
                             cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados puntuales!\n" << RESET << endl;
                             break;
                         }
@@ -444,7 +446,8 @@ int main() {
                         cout << BRIGHT_YELLOW << left << setw(12) << "CODIGO" << setw(25) << "NOMBRE" << setw(20) << "DEPENDENCIA" << right << setw(18) << "HORAS TRABAJADAS" << RESET << "\n";
                         cout << string(90, '-') << "\n";
 
-                        for (const short indiceEmpleado: empleadosPuntuales) {
+                        for (short j = 0; j < numEmpleadosPuntuales; ++j) {
+                            const short indiceEmpleado = empleadosPuntuales[j];
                             string depStr;
                             switch (oficina[indiceEmpleado]) {
                                 case 'C': depStr = "Contabilidad"; break;
@@ -487,7 +490,7 @@ int main() {
                         break;
                     }
                     case 3: {
-                        if (empleadosConTardanza.empty()) {
+                        if (numEmpleadosConTardanza == 0) {
                             cout << "\n" << BRIGHT_RED << "⚠️ No hay empleados con tardanzas." << RESET << endl;
                             break;
                         }
@@ -501,7 +504,8 @@ int main() {
                         cout << BRIGHT_YELLOW << left << setw(10) << "CODIGO" << setw(20) << "NOMBRE" << setw(13) << "DEPENDENCIA" << right << setw(11) << "VALOR/HR" << setw(11) << "HRS TRAB" << setw(11) << "MIN TARD" << setw(11) << "HRS DESC" << setw(11) << "HRS NETAS" << setw(11) << "VAL DESC" << setw(11) << "SAL NETO" << RESET << "\n";
                         cout << string(120, '-') << "\n";
 
-                        for (const short indiceEmpleado: empleadosConTardanza) {
+                        for (short j = 0; j < numEmpleadosConTardanza; ++j) {
+                            const short indiceEmpleado = empleadosConTardanza[j];
                             const float tardanza = datosEmpleados[indiceEmpleado][1];
                             totalHorasDescontadas += tardanza / 60.0f;
                             totalValorDescuentos += datosEmpleados[indiceEmpleado][4];
